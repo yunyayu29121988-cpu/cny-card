@@ -1,32 +1,94 @@
-// 1. 設定 4 種不同的結果（按鈕已改為拜年賀詞）
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026 財富解密 | 金蛇獻瑞</title>
+    <style>
+        body { background-color: #8B0000; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: "Microsoft JhengHei", sans-serif; color: #FFD700; }
+        .container { position: relative; width: 320px; height: 480px; box-shadow: 0 0 25px rgba(0,0,0,0.6); border: 4px solid #FFD700; border-radius: 15px; overflow: hidden; background: #fff; }
+        .prize-layer { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #FFF; color: #333; padding: 20px; box-sizing: border-box; }
+        .prize-layer h2 { color: #D4AF37; font-size: 1.4rem; margin-bottom: 10px; }
+        .prize-layer p { font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; text-align: left; }
+        .btn { padding: 10px 20px; background: #8B0000; color: #fff; border: none; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 10px; }
+        #scratch { position: absolute; top: 0; left: 0; cursor: crosshair; touch-action: none; z-index: 10; }
+        .header { text-align: center; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <span style="font-size: 2rem;">🧧</span>
+        <h1 style="font-size: 1.5rem; margin: 5px 0;">財富開運刮刮卡</h1>
+        <p style="font-size: 0.9rem;">感謝昨日與您共度，請刮開您的 2026 財氣</p>
+    </div>
+
+    <div class="container">
+        <div class="prize-layer" id="prize-content"></div>
+        <canvas id="scratch" width="320" height="480"></canvas>
+    </div>
+
+    <script>
         const results = [
-            { 
-                title: "【大吉．穩健增長】", 
-                text: "<b>財富運勢：</b><br>2026 財運猶如「千里良駒」，勝在耐力而非爆發。資產配置的穩定性將是您的最強後盾，複利將自然發酵。<br><br><b>祝賀詞：</b><br>「志在千里，步步為贏。願您守住財富底氣，在複利效應中靜待資產厚積薄發。」", 
-                btnText: "🧧 步步為贏．開運大吉" 
-            },
-            { 
-                title: "【鴻運．資產躍升】", 
-                text: "<b>財富運勢：</b><br>今年財氣如「一馬當先」，若能靈活調控成長型資產比例，資產規模有望迎來躍進式成長。<br><br><b>祝賀詞：</b><br>「鴻運當頭，掌握先機。預祝您精準捕捉領先趨勢，在配置上展現卓越爆發力，成就財富新高度。」", 
-                btnText: "🧧 一馬當先．鴻運當頭" 
-            },
-            { 
-                title: "【亨通．多元豐收】", 
-                text: "<b>財富運勢：</b><br>2026 是「萬馬奔騰」的格局。您的財富關鍵在於全球佈局，透過不同資產類別協同，讓收益如同春草般全面豐美。<br><br><b>祝賀詞：</b><br>「萬事亨通，佈局全球。願您的組合奔馳四方，透過多元佈局優化抗震力，迎來資產全面豐收。」", 
-                btnText: "🧧 萬馬奔騰．財源廣進" 
-            },
-            { 
-                title: "【平安．守護財富】", 
-                text: "<b>財富運勢：</b><br>今年財運主打「龍馬精神」，重心在於固本培元。建立堅實的風險管理防線，才能確保財富基業穩如泰山。<br><br><b>祝賀詞：</b><br>「平安喜樂，財富永續。願您築起堅實的財富護城河，守護基業長青，為家人建立最強大的後盾。」", 
-                btnText: "🧧 龍馬精神．平安歲好" 
-            }
+            { title: "【大吉．穩健增長】", text: "<b>財富運勢：</b><br>2026 財運猶如「千里良駒」，勝在耐力而非爆發。資產配置的穩定性將是您的最強後盾。<br><br><b>祝賀詞：</b><br>「志在千里，步步為贏。願您守住財富底氣，在複利效應中靜待資產厚積薄發。」", btnText: "🧧 步步為贏．開運大吉" },
+            { title: "【鴻運．資產躍升】", text: "<b>財富運勢：</b><br>今年財氣如「一馬當先」。若能靈活調控成長型資產比例，資產規模有望迎來躍進式成長。<br><br><b>祝賀詞：</b><br>「鴻運當頭，掌握先機。預祝您精準捕捉領先趨勢，在配置上展現卓越爆發力。」", btnText: "🧧 一馬當先．鴻運當頭" },
+            { title: "【亨通．多元豐收】", text: "<b>財富運勢：</b><br>2026 是「萬馬奔騰」的格局。您的財富關鍵在於全球佈局，透過不同資產類別協同，讓收益全面豐美。<br><br><b>祝賀詞：</b><br>「萬事亨通，佈局全球。願您的組合奔馳四方，透過多元佈局優化抗震力，迎來資產全面豐收。」", btnText: "🧧 萬馬奔騰．財源廣進" },
+            { title: "【平安．守護財富】", text: "<b>財富運勢：</b><br>今年財運主打「龍馬精神」，重心在於固本培元。建立堅實的風險管理防線，才能確保財富基業穩如泰山。<br><br><b>祝賀詞：</b><br>「平安喜樂，財富永續。願您築起堅實的財富護城河，守護基業長青，為家人建立最強大的後盾。」", btnText: "🧧 龍馬精神．平安歲好" }
         ];
 
-        // 隨機挑選一個結果並渲染
         const randomResult = results[Math.floor(Math.random() * results.length)];
-        const contentDiv = document.getElementById('prize-content');
-        contentDiv.innerHTML = `
+        document.getElementById('prize-content').innerHTML = `
             <h2>${randomResult.title}</h2>
-            <div style="text-align: left; padding: 0 10px; color: #444;">${randomResult.text}</div>
-            <a href="https://line.me" class="btn" style="margin-top: 20px;">${randomResult.btnText}</a>
+            <p>${randomResult.text}</p>
+            <a href="https://line.me" class="btn">${randomResult.btnText}</a>
         `;
+
+        const canvas = document.getElementById('scratch');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        function init() {
+            ctx.fillStyle = '#C0C0C0';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#8B0000';
+            ctx.font = 'bold 22px Microsoft JhengHei';
+            ctx.textAlign = 'center';
+            ctx.fillText('點擊刮開好運', 160, 240);
+        }
+
+        function scratch(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+            const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 30, 0, Math.PI * 2);
+            ctx.fill();
+            checkPercent();
+        }
+
+        function checkPercent() {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let clearPixels = 0;
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                if (imageData.data[i + 3] === 0) clearPixels++;
+            }
+            if (clearPixels > (imageData.data.length / 4) * 0.5) {
+                canvas.style.transition = 'opacity 1s';
+                canvas.style.opacity = '0';
+                setTimeout(() => canvas.remove(), 1000);
+            }
+        }
+
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        window.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mousemove', scratch);
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); e.preventDefault(); }, {passive: false});
+        canvas.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, {passive: false});
+
+        init();
+    </script>
+</body>
+</html>
